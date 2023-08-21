@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<main>
+    <section class="py-3 text-center container">
+        <div class="row py-lg-3">
+            <div class="col-lg-6 col-md-8 mx-auto">
+                <h1 class="fw-light">Log in</h1>
+            </div>
+        </div>
+    </section>
+    <section class="vh-100 bg-light">
+      <div class="container p-10">
+        <div class="row d-flex align-items-center justify-content-center h-100">
+          <div class="col-md-8 col-lg-7 col-xl-6">
+              <br>
+            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
+              class="img-fluid" alt="Phone image">
+          </div>
+          <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+            <form action="." method="post">
+             {% csrf_token %}
+             {{form|crispy}}
+
+              <div class="d-flex justify-content-around align-items-center mb-4">
+                <!-- Checkbox -->
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="form1Example3" checked />
+                  <label class="form-check-label" for="form1Example3"> Remember me </label>
+                </div>
+                <a href="{% url 'password_reset' %}">Forgot password?</a>
+              </div>
+
+              <!-- Submit button -->
+              <button type="submit" class="btn btn-dark btn-block mb-4">Log in</button>
+
+                <!-- Register buttons -->
+              <div class="text-center">
+                <p>Not a member? <a href="{% url 'register' %}">Register</a></p>
+                <p>or register with:</p>
+                <button type="button" class="btn btn-dark btn-circle btn-circle-lg btn-floating mx-1">
+                  <i class="fa fa-facebook-f"></i>
+                </button>
+
+                <button type="button" class="btn btn-dark btn-circle btn-circle-lg btn-floating mx-1">
+                  <i class="fa fa-google"></i>
+                </button>
+
+                <button type="button" class="btn btn-dark btn-circle btn-circle-lg btn-floating mx-1">
+                  <i class="fa fa-twitter"></i>
+                </button>
+                <a href="#">
+                    <button type="button" class="btn btn-dark btn-circle btn-circle-lg btn-floating mx-1">
+                      <i class="fa fa-github"></i>
+                    </button>
+                </a>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+</main>
+{% endblock %}

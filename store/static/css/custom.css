@@ -1,0 +1,10 @@
+.a-price-symbol {
+    position: relative;
+    top: -0.5em;
+    font-size: 12px;
+}
+
+/* When you mouse over the container, fade in the overlay title */
+.card img:hover{
+     opacity: 0.5;
+}
