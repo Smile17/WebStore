@@ -8,3 +8,8 @@
 .card img:hover{
      opacity: 0.5;
 }
+
+.ml-20 {
+    color: green;
+    margin-left: 20px;
+}

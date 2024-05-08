@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- body -->
+<div class="container">
+	<!-- all cinemas -->
+	<div id='cinemas'>
+
+		<!-------------------->
+
+		{% for cinema in cinemas_with_films %}
+		<div class="accordion" id="accordionExample">
+		  <div class="card">
+			<div class="card-header" id="headingOne">
+			  <h5 class="mb-0">
+				  <div class="card m-2">
+				<div class="row g-0">
+					<div class="col-md-4">
+						<img src="{{cinema.image.url}}" class="img-fluid rounded-start m-4" />
+					</div>
+					<div class="col-md-8">
+						<div class="card-body">
+							<h5 class="card-title">{{cinema.name}}</h5>
+							<ul class="unstyled">
+							  <li>{{cinema.location}}</li>
+							  <li><small class="text-muted">Phone: {{cinema.phone}}</small></li>
+							  <li><small class="text-muted">Email: {{cinema.email}}</small></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+				<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#cinema_{{cinema.id}}" aria-expanded="true" aria-controls="collapseOne">
+				  Розклад сеансів
+				</button>
+			  </h5>
+			</div>
+
+			<div id="cinema_{{cinema.id}}" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+			  <div class="card-body">
+
+				{% for film, halls in cinema.sessions_by_films.items %}
+				  <h3>{{ film.name }}</h3>
+				  <ul>
+					{% for hall, times in halls.items %}
+					  <li>{{ hall }}</li>
+					  	<div class="a-times">
+						  {% for t in times %}
+							  <span class="time f_2d" style="left:{{t.offset}}%;">
+								  <span>{{ t.time }}</span>
+								  <div class="p"><i>100</i>&nbsp;₴</div>
+							  </span>
+						  {% endfor %}
+					  </div>
+					{% endfor %}
+				  </ul>
+			  	{% endfor %}
+			  </div>
+			</div>
+		  </div>
+		</div>
+		{% endfor %}
+
+		</div>
+</div>
+
+{% endblock %}

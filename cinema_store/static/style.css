@@ -1,0 +1,20 @@
+.ml-20 {
+    margin-left: 20px;
+}
+
+ul.unstyled {
+  list-style-type: none;
+  padding: 0;
+}
+
+
+.a-times {
+    display: table-cell;
+    padding-left: 10px;
+}
+
+.time {
+    position: relative;
+    display: inline-block;
+    left: auto !important;
+}
