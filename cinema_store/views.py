@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 
 from django.shortcuts import render
 from cinema_store.models import Cinema, Session, Film
@@ -87,10 +88,16 @@ def buy_tickets(request):
           ticket.is_available = False
           ticket.save()
       # Generate PDF content
-      response = HttpResponse(content_type='application/pdf')
-      response['Content-Disposition'] = 'attachment; filename=ticket.pdf'  # Set download filename
-      generate_pdf_file(response, selected_tickets)
-      return response
+      try:
+          response = HttpResponse(content_type='application/pdf')
+          response['Content-Disposition'] = 'attachment; filename=ticket.pdf'  # Set download filename
+          generate_pdf_file(response, selected_tickets)
+          return response
+      except Exception as e:
+          # Catch errors and provide a more informative response
+          print(f"An error occurred during PDF generation: {e}")
+          return JsonResponse({'message': 'An error occurred while generating the ticket PDF. Please try again later.'},
+                              status=500)
   else:
       return JsonResponse({'error': 'Invalid request method'}, status=400)
 
@@ -103,7 +110,8 @@ import os
 #fn = '/Roboto-Regular.ttf'
 
 def generate_pdf_file(response, selected_tickets):
-    fn = 'C:/Users/kam/PycharmProjects/WebStore/cinema_store/static/Roboto-Regular.ttf'
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    fn = BASE_DIR / 'cinema_store/static/Roboto-Regular.ttf'
     pdfmetrics.registerFont(ttfonts.TTFont('Roboto', fn, 'UTF-8'))
     default_font = 'Roboto'
 

@@ -1,5 +1,5 @@
 """
-URL configuration for webstore project.
+URL configuration for cinema project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -21,6 +21,7 @@ from . import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('cinema_store.urls')),
     path('cinema_store/', include('cinema_store.urls')),
     path("user/", include("user_auth.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

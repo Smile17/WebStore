@@ -22,9 +22,12 @@
             Афіша
         </a>
         {% if user.is_authenticated %}
-              <a href="{% url 'logout' %}" class="navbar-brand d-flex">
-                  <i class="fa fa-sign-out mr-3" aria-hidden="true"></i>
-              </a>
+              <div class="d-flex">
+                  <p class="text-light mr-5">{{user}}</p>
+                  <a href="{% url 'logout' %}" class="navbar-brand d-flex">
+                      <i class="fa fa-sign-out mr-3" aria-hidden="true"></i>
+                  </a>
+              </div>
         {% else %}
               <a href="{% url 'login' %}" class="navbar-brand d-flex">
                   <i class="fa fa-sign-in mr-3" aria-hidden="true"></i>

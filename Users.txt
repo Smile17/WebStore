@@ -1,3 +1,0 @@
-User; Password
-kam; Z7v0ZczYH4CHg9v
-admin;admin

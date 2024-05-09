@@ -1,11 +1,10 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetView, PasswordResetDoneView, \
-    PasswordResetConfirmView, PasswordResetCompleteView
+    PasswordResetConfirmView, PasswordResetCompleteView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from .forms import SignUpForm, ForgotPassword
 from django.contrib import messages
-
 
 class CustomLoginView(LoginView):
     redirect_authenticated_user = True
@@ -17,7 +16,11 @@ class CustomLoginView(LoginView):
     def form_invalid(self, form):
         messages.error(self.request, 'Invalid username or password')
         return self.render_to_response(self.get_context_data(form=form))
-
+class CustomLogoutView(LogoutView):
+    redirect_authenticated_user = True
+    template_name = 'user_auth/logout.html'
+    #"{% url 'logout' %}"
+    #template_name = 'cinema_store/index.html'
 
 class SignUpView(CreateView):
     form_class = SignUpForm
