@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.shortcuts import render
 from cinema_store.models import Cinema, Session, Film
 from datetime import date, datetime, timedelta
@@ -62,8 +64,8 @@ def film_page(request, film_id):
 def session_page(request, session_id):
     session = Session.objects.get(id=session_id)
     film = session.film_id
-    #tickets = session.ticket_set.filter(is_available=True)
-    tickets = session.ticket_set.all()
+    tickets = session.ticket_set.filter(is_available=True)
+    #tickets = session.ticket_set.all() # for testing
     context = {"film": film, "session": session, 'tickets': tickets}
     return render(request, "session.html", context)
 
@@ -76,17 +78,17 @@ import json
 #@login_required
 def buy_tickets(request):
   if request.method == 'POST':
-      #selected_tickets = request.POST["selected_tickets"]
       json_data = json.loads(request.body)
       selected_tickets = json_data.get('selected_tickets')  # Retrieve selected ticket IDs
       # Example logic for updating ticket status (assuming a boolean field `is_available`)
+      print(selected_tickets)
       for ticket_id in selected_tickets:
           ticket = Ticket.objects.get(pk=ticket_id)  # Retrieve the ticket object
           ticket.is_available = False
           ticket.save()
-      # Generate PDF content (example)
+      # Generate PDF content
       response = HttpResponse(content_type='application/pdf')
-      response['Content-Disposition'] = 'attachment; filename=your_tickets.pdf'  # Set download filename
+      response['Content-Disposition'] = 'attachment; filename=ticket.pdf'  # Set download filename
       generate_pdf_file(response, selected_tickets)
       return response
   else:
@@ -99,25 +101,22 @@ from reportlab.pdfbase import ttfonts
 from reportlab.lib.utils import rl_isfile, open_for_read
 import os
 #fn = '/Roboto-Regular.ttf'
-fn = 'C:/Users/kam/PycharmProjects/WebStore/cinema_store/static/Roboto-Regular.ttf'
 
-# Assuming you installed Noto Serif Ukrainian font
-pdfmetrics.registerFont(ttfonts.TTFont('Noto-Sans', fn))
-# Set the default font (example)
-default_font = 'Noto-Sans'
 def generate_pdf_file(response, selected_tickets):
+    fn = 'C:/Users/kam/PycharmProjects/WebStore/cinema_store/static/Roboto-Regular.ttf'
+    pdfmetrics.registerFont(ttfonts.TTFont('Roboto', fn, 'UTF-8'))
+    default_font = 'Roboto'
+
     p = canvas.Canvas(response)
     p.setFont(default_font, 12)  # Set font and size
 
-    tickets = Ticket.objects.all()
+    tickets = Ticket.objects.filter(id__in=selected_tickets)
     # Create a PDF document
     p.drawString(100, 750, "Tickets")
 
     y = 700
     for ticket in tickets:
         session = ticket.session
-        r = f"Film: {session.film_id.name}".encode('utf-8')
-        print(r)
         p.drawString(100, y, f"Film: {session.film_id.name}".encode('utf-8'))
         p.drawString(100, y - 20, f"Cinema: {session.hall_id.cinema_id.name}".encode('utf-8'))
         p.drawString(100, y - 40, f"Hall: {session.hall_id.name}".encode('utf-8'))
@@ -127,4 +126,5 @@ def generate_pdf_file(response, selected_tickets):
 
     p.showPage()
     p.save()
-    return
+
+    return p
