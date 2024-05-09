@@ -4,6 +4,12 @@
 <!-- body -->
 <div class="container">
 	<!-- all cinemas -->
+	<div class="control-group m-2">
+		<div class="form-inline justify-content-end">
+			<label for="date-picker">Pick a Date: </label>
+			<input type="date" class="form-control" id="date-picker" name="date">
+		</div>
+	</div>
 	<div id='cinemas'>
 
 		<!-------------------->
@@ -40,18 +46,30 @@
 			  <div class="card-body">
 
 				{% for film, halls in cinema.sessions_by_films.items %}
-				  <h3>{{ film.name }}</h3>
+				  <a href="{% url 'film_page' film.id %}">
+					<h5>{{ film.name }}</h5>
+				  </a>
 				  <ul>
 					{% for hall, times in halls.items %}
-					  <li>{{ hall }}</li>
-					  	<div class="a-times">
-						  {% for t in times %}
-							  <span class="time f_2d" style="left:{{t.offset}}%;">
-								  <span>{{ t.time }}</span>
-								  <div class="p"><i>100</i>&nbsp;₴</div>
-							  </span>
-						  {% endfor %}
-					  </div>
+					  <div class="row g-0">
+						<div class="col-md-4">
+							{{ hall }}
+						</div>
+						<div class="col-md-8 a-">
+							<div class="a-times">
+							  {% for t in times %}
+								  <span class="time-cell" style="left:{{t.offset}}%;">
+									  <span>
+										  <a href="{% url 'session_page' t.session_id %}">
+											<h5>{{ t.time }}</h5>
+										  </a>
+									  </span>
+									  <div class="p text-muted small"><i>{{ t.price }}</i>&nbsp;₴</div>
+								  </span>
+							  {% endfor %}
+						  </div>
+						</div>
+					</div>
 					{% endfor %}
 				  </ul>
 			  	{% endfor %}
@@ -64,4 +82,26 @@
 		</div>
 </div>
 
-{% endblock %}
+{% endblock content %}
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+        let params = new URLSearchParams(document.location.search);
+		let default_session_date = params.get("session_date");
+		if (default_session_date == null)
+		{
+			const currentDate = new Date();
+			default_session_date = currentDate.toISOString().split('T')[0];
+		}
+         document.getElementById("date-picker").defaultValue = default_session_date;
+		  // Initialize datepicker (if using a library)
+		  $('#date-picker').change(function() {
+			var selectedDate = $(this).val();
+			var url = '/cinema_store/?session_date=' + selectedDate;
+			window.location.replace(url);
+		  });
+		});
+    </script>
+
+{% endblock script %}

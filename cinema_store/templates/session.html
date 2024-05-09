@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% csrf_token %}
+{% block content %}
+<!-- body -->
+<div class="container">
+ <div class="card m-2">
+				<div class="row g-0">
+					<div class="col-md-4">
+						<img src="{{film.image.url}}" class="img-fluid rounded-start m-4" />
+					</div>
+					<div class="col-md-8">
+						<div class="card-body">
+							<h5 class="card-title">{{film.name}}</h5>
+							<ul class="unstyled">
+							  <li>{{film.description}}</li>
+                              <li><small class="text-muted">Жанри: {{film.genres}}</small></li>
+							  <li><small class="text-muted">Тривалість: {{film.duration}}</small></li>
+							  <li><small class="text-muted">Країни: {{film.countries}}</small></li>
+							</ul>
+							<div class="control-group form-inline">
+								<select class="form-control col-8" id="select-tickets" aria-label="Default select example">
+								  <option selected>Select a ticket</option>
+									{% for ticket in tickets %}
+									  <option value="{{ticket.id}}">Ряд {{ticket.row_number}}
+										  Місце {{ticket.seat_number}} Ціна {{ticket.price}}&nbsp;₴</option>
+								  {% endfor %}
+								</select>
+								<button class="btn btn-primary" id="select-ticket-btn">Вибрати</button>
+								<div class="justify-content-end">
+									<button class="btn btn-primary" id="buy-ticket-btn">Купити</button>
+								</div>
+							</div>
+
+							<div class="container mt-3">
+								<ul class="unstyled" id="selected-tickets"></ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+	<script>
+		   $(document).ready(function() {
+			  var selectedTickets = new Set();  // Use Set to store unique ticket IDs
+			  var ticketSelect = $('#select-tickets');  // Select the dropdown element
+			  var selectedTicketsContainer = $('#selected-tickets');  // Select the container element
+			  var buyTicketButton = $('#buy-ticket-btn');  // Select the buy ticket button
+			  var csrftoken = $('[name="csrfmiddlewaretoken"]').attr('value');
+
+			  // Click event handler for the button
+			  $('#select-ticket-btn').click(function() {
+				var selectedTicketId = ticketSelect.val();  // Get the selected option value (ticket ID)
+
+				// Check if a ticket is selected
+				if (selectedTicketId !== "") {
+				  selectedTickets.add(selectedTicketId);  // Add the selected ID to the set
+				  // Update the displayed list of selected tickets
+      			  updateSelectedTicketsList();
+				} else {
+				  alert("Please select a ticket first!");
+				}
+
+				console.log(selectedTickets);
+			  });
+
+			  // Function to update the displayed list of selected tickets
+			  function updateSelectedTicketsList() {
+				selectedTicketsContainer.empty();  // Clear existing content
+				for (const ticketId of selectedTickets) {
+				  var ticketInfo = ticketSelect.find('option[value="' + ticketId + '"]').text();
+				  var ticketListItem = $('<li><span>' + ticketInfo + '</span></li>');  // Create list item element
+
+				  // Add a close button (cross icon) to each list item
+				  var closeButton = $('<span class="close">&#x2716;</span>');  // Use Unicode character for cross icon
+				  closeButton.click(function() {
+					selectedTickets.delete(ticketId);  // Remove ticket ID from the set on close click
+					updateSelectedTicketsList();  // Update the list again
+				  });
+				  ticketListItem.append(closeButton);  // Add close button to list item
+
+				  selectedTicketsContainer.append(ticketListItem);  // Append list item to container
+				}
+			  }
+
+
+
+		     buyTicketButton.click(function() {
+				if (selectedTickets.size === 0) {
+				  alert("Please select tickets before buying!");
+				  return;  // Prevent further execution if no tickets are selected
+				}
+
+				// Prepare data to send with the AJAX request
+				var ticketData = {
+				  selected_tickets: Array.from(selectedTickets)  // Convert Set to array for sending
+				};
+				$.ajax({
+				  type: "POST",
+				  url: "{% url 'buy_tickets' %}",
+				  data: JSON.stringify(ticketData),
+				  contentType: "application/json; charset=utf-8",
+				  beforeSend: function(xhr) {
+					xhr.setRequestHeader("X-CSRFToken", csrftoken);  // Add the CSRF token header
+				  },
+				  success: function(data, textStatus, jqXHR) {
+					if (jqXHR.status === 200) {  // Check for successful response (200)
+					  // Trigger PDF download (using Blob and URL)
+					  var blob = new Blob([data], { type: 'application/pdf' });
+					  var url = window.URL.createObjectURL(blob);
+					  var link = document.createElement('a');
+					  link.href = url;
+					  link.download = 'tickets.pdf';
+					  link.click();
+					  window.URL.revokeObjectURL(url);  // Clean up temporary URL
+					} else {
+					  alert("An error occurred while buying tickets.");
+					}
+				  },
+				  error: function(jqXHR, textStatus, errorThrown) {
+					console.error("Error buying tickets:", textStatus, errorThrown);
+					alert("An error occurred while buying tickets.");
+				  }
+				});
+			});
+
+			});
+	</script>
+{% endblock script %}

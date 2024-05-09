@@ -8,13 +8,29 @@ ul.unstyled {
 }
 
 
-.a-times {
-    display: table-cell;
-    padding-left: 10px;
-}
+
 
 .time {
     position: relative;
     display: inline-block;
     left: auto !important;
+}
+.a-times {
+    display: table;
+    margin-bottom: 60px;
+
+}
+.time-cell
+{
+    position: absolute;
+}
+
+
+.close {
+  font-size: 12px;  /* Adjust font size as needed */
+  cursor: pointer;  /* Set cursor to pointer on hover */
+}
+
+.float-right { /* Remove or adjust this class if not using flexbox */
+  float: right;
 }
